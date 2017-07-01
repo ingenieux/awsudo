@@ -15,34 +15,16 @@ func main() {
 
 	args, err := parseArguments()
 
-	if nil != err {
-		log.Warnf("Oops: %v", err)
-
-		panic(err)
-	}
-
-	if logLevelToUse, ok := args[OPT_LOGLEVEL].(string); ok {
-		if parsedLogLevel, err := log.ParseLevel(logLevelToUse); nil == err {
-			log.SetLevel(parsedLogLevel)
-		}
-	}
-
-	log.Debugf("args: %v", args)
+	AppPanic(err)
 
 	sess, err := session.NewSession()
 
-	if nil != err {
-		log.Warnf("Oops: %v", err)
-
-		panic(err)
-	}
+	AppPanic(err)
 
 	region, ok := args[OPT_REGION].(string)
 
 	if !ok {
-		log.Warnf("%v", EMissingRegion)
-
-		panic(EMissingRegion)
+		AppPanic(EMissingRegion)
 	}
 
 	stsService := sts.New(sess, &aws.Config{
@@ -72,11 +54,7 @@ func main() {
 
 	assumeRoleResults, err := stsService.AssumeRole(assumeRoleRequest)
 
-	if nil != err {
-		log.Warnf("Oops: %v", err)
-
-		panic(err)
-	}
+	AppPanic(err)
 
 	log.Debugf("AssumeRole: %+v", *assumeRoleResults)
 

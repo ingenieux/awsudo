@@ -8,20 +8,20 @@ import (
 	"text/template"
 )
 
-var VERSION = "0.0.1-LOCAL"
+const DOCOPT = `awsudo.
 
-const DOCOPT = `
-awsudo.
-
-Usage: awsudo [options] ROLEARN ROLESESSIONNAME [EXTERNALID]
+Usage:
+  awsudo [<options>] ROLEARN ROLESESSIONNAME [EXTERNALID]
+  awsudo -h | --help
+  awsudo -v | --version
 
 Options:
   -h --help                 This message
+  -v --version              Shows version
   -l --logLevel=<LOGLEVEL>  Set Log Level
   -r --region=<REGION>      STS Region to Use [default: {{.Region}}]
   -s --serial=<SERIAL>      MFA Serial Number / ARN
   -t --token=<TOKENCODE>    MFA Token Code
-  -v --version Version      Shows version
 `
 
 const (
@@ -58,11 +58,17 @@ func parseArguments() (map[string]interface{}, error) {
 
 	docoptTemplate.Execute(docoptContents, templateContext)
 
-	args, err := docopt.Parse(docoptContents.String(), nil, true, VERSION, true, false)
+	args, err := docopt.Parse(docoptContents.String(), nil, true, VERSION, true, true)
 
-	if nil != err {
-		log.Warnf("Oops: %v", err)
+	AppPanic(err)
+
+	if logLevelToUse, ok := args[OPT_LOGLEVEL].(string); ok {
+		if parsedLogLevel, err := log.ParseLevel(logLevelToUse); nil == err {
+			log.SetLevel(parsedLogLevel)
+		}
 	}
+
+	log.Debugf("args: %v", args)
 
 	return args, err
 }
