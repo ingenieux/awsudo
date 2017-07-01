@@ -11,7 +11,7 @@ import (
 const DOCOPT = `awsudo.
 
 Usage:
-  awsudo [<options>] ROLEARN ROLESESSIONNAME [EXTERNALID]
+  awsudo [options] ROLEARN ROLESESSIONNAME [EXTERNALID]
   awsudo -h | --help
   awsudo -v | --version
 
