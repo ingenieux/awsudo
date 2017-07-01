@@ -12,6 +12,7 @@ const DOCOPT = `awsudo.
 
 Usage:
   awsudo [options] ROLEARN ROLESESSIONNAME [EXTERNALID]
+  awsudo [options] profile PROFILENAME
   awsudo -h | --help
   awsudo -v | --version
 
