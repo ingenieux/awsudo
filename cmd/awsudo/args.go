@@ -19,6 +19,7 @@ Usage:
 Options:
   -h --help                 This message
   -v --version              Shows version
+  -e --eval                 Eval Mode
   -l --logLevel=<LOGLEVEL>  Set Log Level
   -r --region=<REGION>      STS Region to Use [default: {{.Region}}]
   -s --serial=<SERIAL>      MFA Serial Number / ARN
@@ -61,7 +62,9 @@ func parseArguments() (map[string]interface{}, error) {
 
 	args, err := docopt.Parse(docoptContents.String(), nil, true, VERSION, true, true)
 
-	AppPanic(err)
+	if nil != err {
+		return nil, err
+	}
 
 	if logLevelToUse, ok := args[OPT_LOGLEVEL].(string); ok {
 		if parsedLogLevel, err := log.ParseLevel(logLevelToUse); nil == err {

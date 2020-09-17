@@ -54,3 +54,6 @@ vendor/src/
 
 #nvm
 .nvimlog
+
+#go module
+go.mod

@@ -12,16 +12,20 @@ func main() {
 
 	args, err := parseArguments()
 
-	AppPanic(err)
+	if nil != err {
+		log.Fatalln(err)
+	}
 
 	sess, err := session.NewSession()
 
-	AppPanic(err)
+	if nil != err {
+		log.Fatalln(err)
+	}
 
 	region, ok := args[OPT_REGION].(string)
 
 	if !ok {
-		AppPanic(EMissingRegion)
+		log.Fatalln(EMissingRegion)
 	}
 
 	stsService := sts.New(sess, &aws.Config{
@@ -51,9 +55,14 @@ func main() {
 
 	assumeRoleResults, err := stsService.AssumeRole(assumeRoleRequest)
 
-	AppPanic(err)
+	if nil != err {
+		log.Fatalln(err)
+	}
 
-	err = executeShell(region, assumeRoleResults)
+	err = executeShell(region, assumeRoleResults, args["--eval"].(bool))
 
-	AppPanic(err)
+	if nil != err {
+		log.Fatalln(err)
+	}
+
 }

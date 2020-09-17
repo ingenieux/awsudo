@@ -3,19 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/service/sts"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
-	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
-func executeShell(region string, stsRole *sts.AssumeRoleOutput) (error) {
+func executeShell(region string, stsRole *sts.AssumeRoleOutput, evalMode bool) error {
 	log.Debugf("AssumeRole: %+v", *stsRole)
-
-	environ := filterCurrentEnvironment()
 
 	unixExpiration := stsRole.Credentials.Expiration.Unix()
 
-	for k, v := range map[string]string{
+	envVars := map[string]string{
 		"AWS_ACCESS_KEY_ID":             *stsRole.Credentials.AccessKeyId,
 		"AWS_SECRET_ACCESS_KEY":         *stsRole.Credentials.SecretAccessKey,
 		"AWS_DEFAULT_REGION":            region,
@@ -23,7 +22,23 @@ func executeShell(region string, stsRole *sts.AssumeRoleOutput) (error) {
 		"AWS_SESSION_ROLE_USER_ARN":     *stsRole.AssumedRoleUser.Arn,
 		"AWS_SESSION_EXPIRATION":        fmt.Sprintf("%d", unixExpiration),
 		"AWS_SESSION_ROLE_USER_ROLE_ID": *stsRole.AssumedRoleUser.AssumedRoleId,
-	} {
+	}
+
+	if evalMode {
+		var statements []string
+
+		for k, v := range envVars {
+			statements = append(statements, fmt.Sprintf("%s=%s", k, v))
+		}
+
+		fmt.Println("export " + strings.Join(statements, " "))
+
+		return nil
+	}
+
+	environ := filterCurrentEnvironment()
+
+	for k, v := range envVars {
 		if v != "" {
 			log.Debugf("Appending variable '%s'", k)
 
